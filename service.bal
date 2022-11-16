@@ -1,17 +1,27 @@
+import ballerinax/mysql;
+import ballerinax/mysql.driver as _;
 import ballerina/http;
+
+type person record {
+    int userId;
+    string nic;
+    string name;
+};
 
 # A service representing a network-accessible API
 # bound to port `9090`.
 service / on new http:Listener(9090) {
 
-    # A resource for generating greetings
-    # + name - the input string name
-    # + return - string name with hello message or error
-    resource function get greeting(string name) returns string|error {
-        // Send a response back to the caller.
-        if name is "" {
-            return error("name should not be empty!");
+    resource function get getdetails(string nic) returns person|error? {
+    mysql:Client mysqlEp = check new (host = "workzone.c6yaihe9lzwl.us-west-2.rds.amazonaws.com", user = "admin", password = "Malithi1234", database = "gramaIdentityCheck", port = 3306);
+
+        person|error queryRowResponse =  mysqlEp->queryRow(sqlQuery = `SELECT * FROM person WHERE nic = ${nic}`);
+        error? e =  mysqlEp.close();
+        if(e is error){
+            return e;
         }
-        return "Hello, " + name;
+        return queryRowResponse;
+
     }
 }
+
