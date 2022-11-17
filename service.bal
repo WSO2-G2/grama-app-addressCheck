@@ -16,6 +16,10 @@ type person record {
     string name;
 };
 
+type status record {
+    string status;
+};
+
 # A service representing a network-accessible API
 # bound to port `9090`.
 service / on new http:Listener(9090) {
@@ -56,5 +60,19 @@ service / on new http:Listener(9090) {
         return queryRowResponse;
 
     }
+
+    resource function patch updateStatus(@http:Payload status payload, string nic) returns sql:ExecutionResult|error {
+
+        mysql:Client mysqlEp2 = check new (host = "workzone.c6yaihe9lzwl.us-west-2.rds.amazonaws.com", user = "admin", password = "Malithi1234", database = "gramaAddressCheck", port = 3306);
+        
+        sql:ExecutionResult executeResponse = check mysqlEp2->execute(sqlQuery = `UPDATE request SET  status = ${payload.status} WHERE nic = ${nic}`);
+        error? e = mysqlEp2.close();
+        if (e is error) {
+            return e;
+        }
+        return executeResponse;
+
+    }
+
 
 }
