@@ -3,6 +3,12 @@ import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
 import ballerina/http;
 
+configurable int PORT = ?;
+configurable string DB = ?;
+configurable string PASSWORD = ?;
+configurable string USER = ?;
+configurable string HOST = ?;
+
 type request record {
     string nic;
     string address;
@@ -21,7 +27,7 @@ service / on new http:Listener(9090) {
 
     resource function post addRequest(@http:Payload request payload) returns sql:ExecutionResult|error {
 
-        mysql:Client mysqlEp1 = check new (host = "workzone.c6yaihe9lzwl.us-west-2.rds.amazonaws.com", user = "admin", password = "Malithi1234", database = "gramaAddressCheck", port = 3306);
+        mysql:Client mysqlEp1 = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
 
         sql:ExecutionResult executeResponse = check mysqlEp1->execute(sqlQuery = `INSERT INTO request VALUES (${payload.nic}, ${payload.address}, ${payload.image}, ${payload.status}, ${payload.gnd})`);
         error? e = mysqlEp1.close();
@@ -33,7 +39,7 @@ service / on new http:Listener(9090) {
     }
 
     resource function get addressCheck(string nic) returns status|error? {
-        mysql:Client mysqlEp4 = check new (host = "workzone.c6yaihe9lzwl.us-west-2.rds.amazonaws.com", user = "admin", password = "Malithi1234", database = "gramaAddressCheck", port = 3306);
+        mysql:Client mysqlEp4 = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
 
         status|error queryRowResponse = mysqlEp4->queryRow(sqlQuery = `SELECT status FROM request WHERE nic = ${nic} `);
         error? e = mysqlEp4.close();
