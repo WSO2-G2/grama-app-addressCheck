@@ -30,7 +30,7 @@ service / on new http:Listener(9090) {
 
         mysql:Client mysqlEp1 = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
 
-        sql:ExecutionResult executeResponse = check mysqlEp1->execute(sqlQuery = `INSERT INTO request(nic,address,image,status,phone) VALUES(${payload.nic}, ${payload.address}, ${payload.image}, ${payload.status}, ${payload.phone}, ${payload.email})`);
+        sql:ExecutionResult executeResponse = check mysqlEp1->execute(sqlQuery = `INSERT INTO request(nic,address,image,status,phone,email) VALUES(${payload.nic}, ${payload.address}, ${payload.image}, ${payload.status}, ${payload.phone}, ${payload.email})`);
         error? e = mysqlEp1.close();
         if (e is error) {
             return e;
