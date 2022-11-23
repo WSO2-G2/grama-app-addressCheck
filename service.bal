@@ -39,16 +39,24 @@ service / on new http:Listener(9090) {
 
     }
 
-    resource function get addressCheck(string nic) returns status|error? {
+    resource function get addressCheck(string nic) returns status|error?|boolean {
         mysql:Client mysqlEp4 = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
 
         status|error queryRowResponse = mysqlEp4->queryRow(sqlQuery = `SELECT status FROM request WHERE nic = ${nic} `);
         error? e = mysqlEp4.close();
+        boolean result;
         if (e is error) {
             return e;
         }
         else {
-            return queryRowResponse;
+            if (queryRowResponse is error) {
+            result = false;
+            return result;
+            }
+            else
+            {
+                return queryRowResponse;
+            }
         }
 
     }
