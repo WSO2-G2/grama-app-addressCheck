@@ -39,18 +39,18 @@ service / on new http:Listener(9090) {
 
     }
 
-    resource function get addressCheck(string nic) returns status|error?|boolean {
+    resource function get addressCheck(string nic) returns status|error? {
         mysql:Client mysqlEp4 = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
 
         status|error queryRowResponse = mysqlEp4->queryRow(sqlQuery = `SELECT status FROM request WHERE nic = ${nic} `);
         error? e = mysqlEp4.close();
-        boolean result;
+        
         if (e is error) {
             return e;
         }
         else {
             if (queryRowResponse is error) {
-            result = false;
+            status result = {status:"Unregistered ID"};
             return result;
             }
             else
